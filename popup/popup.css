@@ -1,0 +1,58 @@
+:root {
+  --bg: #fff;
+  --text: #222;
+  --muted: #888;
+  --on: #2e9e5b;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #2b2a33;
+    --text: #fbfbfe;
+    --muted: #8f8f9d;
+    --on: #4cc38a;
+  }
+}
+
+body {
+  width: 170px;
+  margin: 0;
+  padding: 12px;
+  background: var(--bg);
+  color: var(--text);
+  font: 13px system-ui, sans-serif;
+  text-align: center;
+}
+
+h1 {
+  margin: 0 0 10px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+#toggle {
+  width: 84px;
+  height: 84px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+#toggle[aria-pressed="true"] {
+  color: var(--on);
+}
+
+#toggle svg {
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+p {
+  margin: 8px 0 0;
+}

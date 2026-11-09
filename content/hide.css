@@ -1,0 +1,120 @@
+/*
+ * Every rule is gated on html:not(.ynvl-reveal), so content stays hidden until
+ * the saved setting says otherwise. A slow settings read can't flash a duration.
+ *
+ * All YouTube selectors live in this file. When YouTube changes its markup,
+ * this is the place to fix.
+ */
+
+/* Thumbnails: duration badges and "watched" progress bars (old and new markup) */
+html:not(.ynvl-reveal) ytd-thumbnail-overlay-time-status-renderer,
+html:not(.ynvl-reveal) ytd-thumbnail-overlay-resume-playback-renderer,
+html:not(.ynvl-reveal) yt-thumbnail-bottom-overlay-view-model,
+html:not(.ynvl-reveal) yt-thumbnail-overlay-progress-bar-view-model,
+html:not(.ynvl-reveal) .ytThumbnailBottomOverlayViewModelBadgeContainer,
+html:not(.ynvl-reveal) badge-shape.ytBadgeShapeThumbnailBadge {
+  display: none !important;
+}
+
+/* Search results quote a chapter with its timestamp */
+html:not(.ynvl-reveal) .metadata-snippet-timestamp {
+  display: none !important;
+}
+
+/* Hover previews on thumbnails run a small player with its own clock */
+html:not(.ynvl-reveal) ytd-video-preview .ytp-time-display,
+html:not(.ynvl-reveal) #inline-preview-player .ytp-time-display {
+  display: none !important;
+}
+
+/*
+ * Player: keep elapsed time, drop everything else in the clock. This is an
+ * allowlist because other extensions add to it too: SponsorBlock, for one,
+ * appends the duration after skips, as in "0:10 (12:04)".
+ */
+html:not(.ynvl-reveal) .ytp-time-display > :not(.ytp-time-wrapper):not(.ytp-clip-watch-full-video-button):not(.ytp-clip-watch-full-video-button-separator),
+html:not(.ynvl-reveal) .ytp-time-wrapper > :not(.ytp-time-contents):not(.ytp-live-badge),
+html:not(.ynvl-reveal) .ytp-time-contents > :not(.ytp-time-current):not(.ytp-time-clip-icon) {
+  display: none !important;
+}
+
+/* Clicking the clock can switch it to time remaining */
+html:not(.ynvl-reveal) .ytp-time-wrapper,
+html:not(.ynvl-reveal) .ytp-time-contents {
+  pointer-events: none !important;
+}
+
+/*
+ * Player: progress bar, playhead, heatmap and scrub previews. These use
+ * opacity rather than display:none because the player measures the bar.
+ */
+html:not(.ynvl-reveal) .ytp-progress-bar-container,
+html:not(.ynvl-reveal) .ytp-chapter-container,
+html:not(.ynvl-reveal) .ytp-chapter-hover-container,
+html:not(.ynvl-reveal) .ytp-storyboard-framepreview,
+html:not(.ynvl-reveal) .ytp-tooltip-progress-bar-pill,
+html:not(.ynvl-reveal) .ytp-tooltip-duration {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* Near the end of a video: end cards, plus durations of what plays next */
+html:not(.ynvl-reveal) .ytp-ce-element,
+html:not(.ynvl-reveal) .ytp-autonav-timestamp,
+html:not(.ynvl-reveal) .ytp-modern-videowall-still-info-duration,
+html:not(.ynvl-reveal) .ytp-videowall-still-info-duration {
+  display: none !important;
+}
+
+/* Chapters and key moments, in the description and in the side panel */
+html:not(.ynvl-reveal) ytd-horizontal-card-list-renderer:has(ytd-macro-markers-list-item-renderer),
+html:not(.ynvl-reveal) ytd-macro-markers-list-renderer,
+html:not(.ynvl-reveal) ytd-engagement-panel-section-list-renderer[target-id^="engagement-panel-macro-markers"] {
+  display: none !important;
+}
+
+/* Transcript stays readable; only its timestamps go */
+html:not(.ynvl-reveal) ytd-transcript-segment-renderer .segment-timestamp,
+html:not(.ynvl-reveal) .ytwTranscriptSegmentViewModelTimestamp {
+  visibility: hidden !important;
+}
+
+/* Timestamp links in the description. Comments are deliberately left alone. */
+html:not(.ynvl-reveal) ytd-text-inline-expander a[href*="&t="],
+html:not(.ynvl-reveal) ytd-text-inline-expander a[href*="?t="] {
+  filter: blur(5px);
+}
+
+/* Skip buttons, shown in the space the progress bar used to occupy */
+.ynvl-skip {
+  position: absolute;
+  z-index: 60;
+  left: 0;
+  right: 0;
+  bottom: 100%;
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  padding-bottom: 4px;
+  pointer-events: none;
+}
+
+html.ynvl-reveal .ynvl-skip,
+.ad-showing .ynvl-skip {
+  display: none !important;
+}
+
+.ynvl-skip button {
+  pointer-events: auto;
+  padding: 4px 10px;
+  border: 0;
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  font: 500 13px/1.4 Roboto, Arial, sans-serif;
+  cursor: pointer;
+}
+
+.ynvl-skip button:hover {
+  background: rgba(70, 70, 70, 0.9);
+}

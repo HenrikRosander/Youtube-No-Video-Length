@@ -1,0 +1,61 @@
+# Pushing a tag like v0.3.0 signs the add-on with Mozilla (unlisted), attaches
+# the .xpi to a GitHub Release, and lists it in updates.json so installed
+# copies of Firefox pick it up.
+#
+# Needs repo secrets AMO_API_KEY and AMO_API_SECRET, from
+# https://addons.mozilla.org/developers/addon/api/key/
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check the tag matches the manifest version
+        run: |
+          VERSION=$(jq -r .version manifest.json)
+          if [ "v$VERSION" != "$GITHUB_REF_NAME" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME doesn't match manifest version $VERSION"
+            exit 1
+          fi
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          echo "XPI=youtube-no-video-length-$VERSION.xpi" >> "$GITHUB_ENV"
+
+      - name: Sign with Mozilla (unlisted)
+        env:
+          WEB_EXT_API_KEY: ${{ secrets.AMO_API_KEY }}
+          WEB_EXT_API_SECRET: ${{ secrets.AMO_API_SECRET }}
+        run: |
+          npx --yes web-ext@8 sign \
+            --channel=unlisted \
+            --artifacts-dir=web-ext-artifacts \
+            --ignore-files updates.json README.md
+          cp web-ext-artifacts/*.xpi "$XPI"
+
+      - name: Create the GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" "$XPI" --title "$GITHUB_REF_NAME" --generate-notes
+
+      - name: Publish the update to Firefox
+        run: |
+          git fetch origin main
+          git checkout -B main origin/main
+          ID=$(jq -r .browser_specific_settings.gecko.id manifest.json)
+          URL="https://github.com/$GITHUB_REPOSITORY/releases/download/$GITHUB_REF_NAME/$XPI"
+          jq --arg id "$ID" --arg v "$VERSION" --arg u "$URL" \
+            '.addons[$id].updates += [{version: $v, update_link: $u}]' updates.json > updates.tmp
+          mv updates.tmp updates.json
+          git config user.name "github-actions[bot]"
+          git config user.email "41898299+github-actions[bot]@users.noreply.github.com"
+          git commit -am "Publish $VERSION in updates.json"
+          git push origin main
