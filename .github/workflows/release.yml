@@ -38,7 +38,7 @@ jobs:
           npx --yes web-ext@8 sign \
             --channel=unlisted \
             --artifacts-dir=web-ext-artifacts \
-            --ignore-files updates.json README.md
+            --ignore-files updates.json README.md .env.example
           cp web-ext-artifacts/*.xpi "$XPI"
 
       - name: Create the GitHub release
