@@ -1,7 +1,12 @@
 {
   "addons": {
     "youtube-no-video-length@henrikrosander.github.io": {
-      "updates": []
+      "updates": [
+        {
+          "version": "0.2.0",
+          "update_link": "https://github.com/HenrikRosander/Youtube-No-Video-Length/releases/download/v0.2.0/youtube-no-video-length-0.2.0.xpi"
+        }
+      ]
     }
   }
 }
